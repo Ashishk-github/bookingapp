@@ -1,51 +1,71 @@
-const myForm = document.querySelector('#my-form');
-const nameInput = document.querySelector('#name');
-const emailInput = document.querySelector('#email');
-const msg = document.querySelector('.msg');
-const userList = document.querySelector('#users');
-if(userList.value===undefined && localStorage.length!=0){
-    let obj_deser=JSON.parse(localStorage.getItem('myobj'));
-    var deleteBtn = document.createElement('button');
-    deleteBtn.appendChild(document.createTextNode('X'));
-    var li= document.createElement('li');
-    li.appendChild(document.createTextNode(obj_deser.name+ ' : ' + obj_deser.email));
-    li.appendChild(deleteBtn)
-    userList.appendChild(li);
+function saveToLocalStorage(event) {
+    event.preventDefault();
+    const name = event.target.username.value;
+    const email = event.target.emailId.value;
+    const obj = {
+        name,
+        email
+        }
+    axios.post('https://crudcrud.com/api/d92030668a1640568956d97c074caf3a/userDetails',obj.email ={
+        name,
+        email
+        }).then((res)=>{showNewUserOnScreen(res.data)})
+        .catch((err)=>crossOriginIsolated.log(err));
+        
+    //showNewUserOnScreen(obj)
 }
-
-myForm.addEventListener('submit', onSubmit);
-userList.addEventListener('click', del);
-function del(e){
-    console.log(e.target);
-    localStorage.removeItem('myobj');
-    var li = e.target.parentElement;
-    userList.removeChild(li); 
-}
-function onSubmit(e) {
-  e.preventDefault();
-  
-  if(nameInput.value === '' || emailInput.value === '') {
-    msg.classList.add('error');
-    msg.innerHTML = 'Please enter all fields';
-    setTimeout(() => msg.remove(), 3000);
-  } else {
-    const li = document.createElement('li');
-    const del= document.createElement('button');
-    del.textContent='X';
-    li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
-    li.appendChild(del);
-    userList.appendChild(li);
+window.addEventListener("DOMContentLoaded", () => {
+    axios.get('https://crudcrud.com/api/d92030668a1640568956d97c074caf3a/userDetails')
+        .then((res)=>{
+            for(var i =0; i< res.data.length; i++){
+                showNewUserOnScreen(res.data[i])
+            }
+        })
     
-    let myobj={
-        name:nameInput.value,
-        email:emailInput.value
-    };
-    let obj_ser=JSON.stringify(myobj);
-    localStorage.setItem(obj_ser,obj_ser);
-    
+})
 
-
-    nameInput.value = '';
-    emailInput.value = '';
-  }
+function showNewUserOnScreen(user){
+    document.getElementById('emailId').value = '';
+    document.getElementById('username').value = '';
+    const parentNode = document.getElementById('listOfUsers');
+    const childHTML = `<li id=${user._id}> ${user.name} - ${user.email}
+                            <button onclick=deleteUser('${user._id}')> Delete User </button>
+                            <button onclick=editUserDetails(${emailId},${user.name},'${user._id}')>Edit User </button>
+                         </li>`
+    parentNode.innerHTML = parentNode.innerHTML + childHTML;
 }
+
+//Edit User
+
+function editUserDetails(emailId,name,id){
+
+    document.getElementById('emailId').value = emailId;
+    document.getElementById('username').value = name;
+
+    deleteUser(id);
+ }
+
+// deleteUser('abc@gmail.com')
+
+function deleteUser(id){
+    let url='https://crudcrud.com/api/d92030668a1640568956d97c074caf3a/userDetails'
+    url=url+'/'+id.toString();
+    alert(url)
+    axios.delete(url);
+    removeUserFromScreen(id);
+
+}
+
+function removeUserFromScreen(id){
+    const parentNode = document.getElementById('listOfUsers');
+    const childNodeToBeDeleted = document.getElementById(id);
+    if(childNodeToBeDeleted) {
+        parentNode.removeChild(childNodeToBeDeleted)
+    }
+}
+
+
+
+
+
+
