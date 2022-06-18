@@ -6,7 +6,7 @@ function saveToLocalStorage(event) {
         name,
         email
         }
-    axios.post('https://crudcrud.com/api/a69ce81d4dc04192ad00658f6dd62692/userDetails',obj.email ={
+    axios.post('https://crudcrud.com/api/a69ce81d4dc04192ad00658f6dd62692/userDetails',{
         name,
         email
         }).then((res)=>{showNewUserOnScreen(res.data)})
