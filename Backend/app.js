@@ -2,22 +2,17 @@ const path = require('path');
 var cors=require('cors');
 const express = require('express');
 const app = express();
-
+app.use(cors());
 const bodyParser = require('body-parser');
 const sequelize = require('./util/database');
 //const userRoutes=require('./routes/user');
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors);
+app.use(bodyParser.urlencoded());
+//app.use(express.json());
 const userController = require('./controllers/userC');
-app.get('/getusers', (req,res,next)=>{
-  console.log(req.body);
-  next();
-  // User.findAll()
-  // .then(users=>res.send(json(users)))
-  // .catch(err=>console.log(err));
-});
+app.get('/getusers',userController.getAllReq);
 app.post('/addnewuser',userController.postReq);
+app.delete('/deleteuser/:id',userController.deleteReq);
 sequelize
   .sync()
   .then(result => {
